@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-hook-proxy-deployment
+  namespace: jenkins-hook-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins-hook-proxy-app
+  template:
+    metadata:
+      namespace: jenkins-hook-proxy
+      labels:
+        app: jenkins-hook-proxy-app
+    spec:
+      containers:
+        - name: jenkins-hook-proxy-server
+          image: srcd/jenkins-hook-proxy:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 9000
+          env:
+            - name: LOG_LEVEL
+              value: debug
+            - name: JENKINS_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: jenkins-hook-proxy-secret
+                  key: jenkins-endpoint
+            - name: GITHUB_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jenkins-hook-proxy-secret
+                  key: github-secret
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: jenkins-hook-proxy-secret
+                  key: slack-token
+            - name: SLACK_CHANNEL
+              valueFrom:
+                secretKeyRef:
+                  name: jenkins-hook-proxy-secret
+                  key: slack-channel

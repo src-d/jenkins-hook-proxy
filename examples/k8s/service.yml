@@ -1,0 +1,18 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: jenkins-hook-proxy
+---
+# NOTE consider changing service type to LoadBalancer to expose an endpoint
+kind: Service
+apiVersion: v1
+metadata:
+  name: jenkins-hook-proxy-service
+  namespace: jenkins-hook-proxy
+spec:
+  selector:
+    app: jenkins-hook-proxy-app
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: http

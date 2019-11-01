@@ -1,0 +1,31 @@
+language: go
+
+go:
+  - '1.13.x'
+
+services:
+  - docker
+
+go_import_path: github.com/src-d/jenkins-hook-proxy
+
+install:
+  - go generate ./...
+
+script:
+  - go test -v ./...
+
+before_deploy:
+  - make packages
+
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  file_glob: true
+  file: build/*.tar.gz
+  skip_cleanup: true
+  on:
+    branch: master
+    tags: true
+
+after_deploy:
+  - DOCKER_PUSH_MASTER=1 make docker-push-latest-release
